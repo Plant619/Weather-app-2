@@ -19,21 +19,16 @@
         <h1 class="text-center">Weather App</h1>
 
         <h2 class="my-2">Choose your location</h2>
-        <!-- Add a search bar --> 
         <!-- Fetch the countries -->
         <!-- Detect when change occurs -->
         <!-- limit options shown to 5 -->
 
-        <form>
-            <select id="country-select" class="form-select">
-                <option value="">Select a country</option>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="GB">United Kingdom</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
-                <option value="JP">Japan</option>
-                <option value="AU">Australia</option>
+        <form id="location-form">
+            <select id="country-select" class="form-select mb-4">
+            </select>
+
+            <select id="city-select" class="form-select">
+                <option value="">Select a city after choosing your country</option>
             </select>
         </form>
 
