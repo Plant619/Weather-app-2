@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     //////////////////////////////////////////////////////////////////////////////////////
     // get countries (country state city docs)
     //////////////////////////////////////////////////////////////////////////////////////
 
     async function getCountries() {
-        const url = `https://api.countrystatecity.in/v1/countries`;
+        const url = `localhost:3000/api/countries`;
 
-        let response = await fetch(url, {
-            headers: { 'X-CSCAPI-KEY': '536ea2549dd578bcaf72d6d341ca744cf183d4fce45c87c5d11678c6b1ec5eca' }
-        });
-
+        let response = await fetch(url);
         let countriesData = await response.json();
 
         console.log(countriesData);
@@ -37,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         countrySelect.innerHTML = tempHTML;
     }
 
-    // calls function to get and display countries
+    // calls function to get and display countries in the select menu
     getCountries().then(countries => {
         showCountries(countries);
 
@@ -53,8 +51,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     })
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Listening and responding to changes in country-select
+    //////////////////////////////////////////////////////////////////////////////////////
 
-    // gets all countries and their flags (used for options beside names) ? 
+    document.getElementById('country-select').addEventListener('change', () => {
+        const selectedCountryCode = document.getElementById('country-select').value;
+        console.log(selectedCountryCode);
+
+        // get cities of the selected country
+        getCitiesByCountry(selectedCountryCode).then(cities => {
+
+            // checking if country has many cities (US, China, India) gets states instead
+            if (cities.length > 1000) {
+                getStatesByCountry(selectedCountryCode).then(states => {
+                    showCities(cities);
+
+                    // Allows users to search for cities in dropdown
+                    const citySelect = document.getElementById('city-select');
+                    new Choices(citySelect, {
+                        searchEnabled: true,   // Dropdown is searchable
+                        itemSelectText: '',    // Remove "Press to select" hint
+                        shouldSort: false,     // Keep countries in original order
+                        placeholder: true,
+                        placeholderValue: 'Select a city/state'
+                    });
+                })
+
+            } else {
+                showCities(cities);
+
+                // Allows users to search for cities in dropdown
+                const citySelect = document.getElementById('city-select');
+                new Choices(citySelect, {
+                    searchEnabled: true,   // Dropdown is searchable
+                    itemSelectText: '',    // Remove "Press to select" hint
+                    shouldSort: false,     // Keep countries in original order
+                    placeholder: true,
+                    placeholderValue: 'Select a city/state'
+                });
+            }
+        })
+
+    })
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -65,11 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/cities`;
 
         let response = await fetch(url, {
-            headers: { 'X-CSCAPI-KEY': '536ea2549dd578bcaf72d6d341ca744cf183d4fce45c87c5d11678c6b1ec5eca' }
+            headers: { 'X-CSCAPI-KEY': process.env.CSC_API_KEY }
         });
 
         if (response.ok) {
             let citiesData = await response.json();
+            console.log(citiesData);
+
             return citiesData;
         } else {
             console.error('Error getCitiesByCountry: Country not found or no cities available');
@@ -78,12 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    // NOTE: some countries have many cities consider using states
+    // NOTE: some countries have many cities consider using states (US, India, China)
     // getCitiesByCountry()
-
-
-
-
 
     //////////////////////////////////////////////////////////////////////////////////////
     // fetch weather information by calling API (openWeather)
@@ -113,5 +150,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 })
 
-// conutry state docs
-// 536ea2549dd578bcaf72d6d341ca744cf183d4fce45c87c5d11678c6b1ec5eca
