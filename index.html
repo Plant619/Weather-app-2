@@ -3,9 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <!-- Choices CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js" defer></script>
+
     <title>Weather app</title>
 </head>
-<body>
-    <h1>Welcome!</h1>
+<body id="body">
+    <div class="m-5">
+        <h1 class="text-center">Weather App</h1>
+
+        <h2 class="my-2">Choose your location</h2>
+        <!-- Add a search bar --> 
+        <!-- Fetch the countries -->
+        <!-- Detect when change occurs -->
+        <!-- limit options shown to 5 -->
+
+        <form>
+            <select id="country-select" class="form-select">
+                <option value="">Select a country</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="FR">France</option>
+                <option value="DE">Germany</option>
+                <option value="JP">Japan</option>
+                <option value="AU">Australia</option>
+            </select>
+        </form>
+
+        <!-- Hide this when a location is not selected -->
+        <div id="weather-info">
+            <h2 class="my-3">Current Temperature: </h2>
+            <h3>Chance of Rain: </h3>
+        </div>
+            
+    </div>
+
 </body>
 </html>

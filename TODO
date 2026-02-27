@@ -1,0 +1,7 @@
+1. Fetch weather information from API
+2. Finish HTML page
+3. Add logic for the HTML page
+4. Display information nicely
+
+Ideas: 
+1. Change background based on the time of day and current weather (night, sunny, cloudy, rainy, snowy)

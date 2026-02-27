@@ -1,0 +1,10 @@
+#body {
+    background-image: url(./images/bg-sunny-day.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+#weather-info {
+    display: none;
+}
