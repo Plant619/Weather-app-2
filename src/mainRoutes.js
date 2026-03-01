@@ -5,6 +5,7 @@ const cscAPIKey = process.env.CSC_API_KEY;
 const rapidAPIKey = process.env.RAPID_API_KEY;
 const owAPIKEY = process.env.OW_API_KEY;
 
+// gets countries
 router.get('/countries', async (req, res, next) => {
 
     try {
@@ -50,6 +51,7 @@ router.get('/countries', async (req, res, next) => {
 
 // });
 
+// gets weather based on latitude and longitude
 router.get('/weather/:lat/:lon', async (req, res, next) => {
 
     try {
@@ -70,6 +72,7 @@ router.get('/weather/:lat/:lon', async (req, res, next) => {
 
 })
 
+// gets cities by country
 router.get('/cities/:country', async (req, res, next) => {
 
     try {
@@ -97,6 +100,7 @@ router.get('/cities/:country', async (req, res, next) => {
 
 });
 
+// gets states by country
 router.get('/states/:country', async (req, res, next) => {
 
     try {
@@ -113,12 +117,42 @@ router.get('/states/:country', async (req, res, next) => {
             res.status(200).json(citiesData);
 
         } else {
-            console.error('Error getCitiesByCountry: Country not found or no cities available');
+            console.error('Error getStatesByCountry: Country not found or no cities available');
             res.status(404).json();
         }        
     } catch (err) {
         console.error(err);
         res.status(500).json('/states/:country', err);
+    }
+
+})
+
+// get location by city (lat, lon)
+router.get('/location/:cityName/:countryCode', async (req, res, next) => {
+
+    try {
+        const cityName = req.params.cityName;
+        const countryCode = req.params.countryCode;
+
+        const encodedCity = encodeURIComponent(cityName);
+
+        const url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodedCity},${countryCode}&appid=${owAPIKEY}`;
+
+        let response = await fetch(url);
+
+        if (response.ok) {
+            let cityData = await response.json();
+            console.log('location: cityData', cityData)
+            res.status(200).json(cityData);
+
+        } else {
+            console.error('Error getLocationByCity: City not found');
+            res.status(404).json();
+        }        
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json('/location/:cityName', err);
     }
 
 })

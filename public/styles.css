@@ -7,4 +7,14 @@
 
 #weather-info {
     display: none;
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+    border-radius: 16px;
+    /* max-width: fit-content; */
+    padding: 20px;
+    text-align: center;
+    margin-top: 50px;
+
+    /* Frosted glass blur */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* for Safari */
 }

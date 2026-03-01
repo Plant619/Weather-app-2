@@ -85,12 +85,24 @@ document.addEventListener('DOMContentLoaded', () => {
             placeholder: true,
             placeholderValue: 'Select a city/state'
         });
+
+        // listens to changes in city-select
+        document.getElementById('city-select').addEventListener('change', async () => {
+            const selectedCityName = document.getElementById('city-select').value;
+
+            let locationInfo = await getCityLocationInfo(selectedCityName, selectedCountryCode);
+
+            let lat = locationInfo[0].lat;
+            let lon = locationInfo[0].lon;
+
+            console.log(lat, lon)
+
+            let weatherInfo = await getWeatherInfo(lat, lon);
+
+            showWeatherInfo(weatherInfo);
+        })
+
     })
-
-    
-
-
-
     
     //////////////////////////////////////////////////////////////////////////////////////
     // get cities (country state city docs)
@@ -118,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //////////////////////////////////////////////////////////////////////////////////////
     // display cities as select options
     //////////////////////////////////////////////////////////////////////////////////////
+
     async function showCities(cities) {
         const citiesSelect = document.getElementById('city-select');
         // stores html that will be added to country select
@@ -126,10 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < cities.length; i++) {
             // store the lat and long
             let cityName = cities[i].name;
-            let lat = cities[i].latitude;
-            let long = cities[i].longitude;
 
-            tempHTML += `<option value="${[lat, long]}">${cityName}</option>`;
+            tempHTML += `<option value="${cityName}">${cityName}</option>`;
         }
 
         citiesSelect.innerHTML = tempHTML;
@@ -138,19 +149,92 @@ document.addEventListener('DOMContentLoaded', () => {
     //////////////////////////////////////////////////////////////////////////////////////
     // get states (country state city docs)
     //////////////////////////////////////////////////////////////////////////////////////
-    async function getStatesByCountry(params) {
-        
+
+    async function getStatesByCountry(countryCode) {
+        const url = `/api/states/${countryCode}`;
+
+        let response = await fetch(url);
+
+        if (response.ok) {
+            let citiesData = await response.json();
+            console.log(citiesData);
+
+            return citiesData;
+        } else {
+            console.error('Error getCitiesByCountry: Country not found or no states available');
+            return [];
+        }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // fetch location information of city by calling API (openWeather)
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    async function getCityLocationInfo(cityName, countryCode) {
+        const url = `/api/location/${cityName}/${countryCode}`;
+
+        let response = await fetch(url);
+
+        if (response.ok) {
+            let data = await response.json()
+            console.log('location', data);
+
+            return data;
+
+        } else {
+            console.error('Error getCityLocationInfo');
+            return [];
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // fetch weather information by calling API (openWeather)
     //////////////////////////////////////////////////////////////////////////////////////
 
-    async function getWeatherInfo(url) {
+    async function getWeatherInfo(lat, lon) {
+        const url = `/api/weather/${lat}/${lon}`;
+
         let response = await fetch(url);
-        let data = await response.json();
+
+        if (response.ok) {
+            let data = await response.json()
+            console.log(data);
+
+            return data;
+
+        } else {
+            console.error('Error getWeatherInfo');
+            return [];
+        }
     }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // display weather information 
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    function showWeatherInfo(weather) {
+
+        const temp = weather.main.temp;
+        const feels_like = weather.main.feels_like;
+        const humidity = weather.main.humidity;
+        const mainDescription = weather.weather[0].main;
+        const description = weather.weather[0].description;
+        const windSpeed = weather.wind.speed;
+        const clouds = weather.clouds.all;
+
+        document.getElementById('temp').innerText = `Current Temperature: ${temp}°C`;
+        document.getElementById('feels_like').innerText = `Feels Like: ${feels_like}°C`;
+        document.getElementById('humidity').innerText = `Humidity: ${humidity}%`;
+        document.getElementById('desc').innerText = 'Description: ' + mainDescription + ', ' + description;
+        document.getElementById('wind_speed').innerText = `Wind Speed: ${windSpeed}m/s`;
+        document.getElementById('clouds').innerText = `Clouds: ${clouds}%`;
+
+        document.getElementById('weather-info').style.display = 'block';
+
+    }
+
+
 
 
     // getWeatherInfo('https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}');

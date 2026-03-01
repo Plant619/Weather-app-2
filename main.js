@@ -17,7 +17,7 @@ app.whenReady().then(() => {
     });
 
     // load a webpage
-    myWindow.loadFile('index.html');
+    myWindow.loadFile('/index.html');
 
     console.log('App running');
 })
