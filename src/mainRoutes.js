@@ -1,21 +1,80 @@
 const express = require('express');
 const router = express.Router();
 
-const apiKey = process.env.CSC_API_KEY;
+const cscAPIKey = process.env.CSC_API_KEY;
+const rapidAPIKey = process.env.RAPID_API_KEY;
+const owAPIKEY = process.env.OW_API_KEY;
 
 router.get('/countries', async (req, res, next) => {
-    const url = `https://api.countrystatecity.in/v1/countries`;
 
-    let response = await fetch(url, {
-        headers: { 'X-CSCAPI-KEY': apiKey }
-    });
+    try {
+        const url = `https://api.countrystatecity.in/v1/countries`;
 
-    let countriesData = await response.json();
+        let response = await fetch(url, {
+            headers: { 'X-CSCAPI-KEY': cscAPIKey }
+        });
 
-    console.log(countriesData);
+        let countriesData = await response.json();
 
-    res.status(200).json(countriesData);
+        res.status(200).json(countriesData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json('/countries', err);
+    }
+    
 });
+
+// router.get('/cities/:country', async (req, res, next) => {
+
+//     try {
+//         const countryCode = req.params.country;
+//         const url = `http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}`;
+
+//         const response = await fetch(url, {
+//             method: 'GET',
+//             headers: { 
+//                 'X-RapidAPI-Key': rapidAPIKey,
+//                 'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+//             }
+//         });
+
+//         let citiesData = await response.json();
+//         console.log(citiesData);
+//         res.status(200).json(citiesData.data);
+
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json('/cities/:country', err);
+//     }
+
+// });
+
+router.get('/weather/:lat/:lon', async (req, res, next) => {
+
+    try {
+        const lat = req.params.lat;
+        const lon = req.params.lon;
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${owAPIKEY}&units=metric`;
+
+        const response = await fetch(url);
+
+        let weatherData = await response.json();
+        console.log(weatherData);
+        res.status(200).json(weatherData);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json('/weather/:lat/:lon', err);
+    }
+
+})
+
+
+module.exports = router;
+
+
+
+
 
 
 router.get('/cities/:country', async (req, res, next) => {
@@ -25,12 +84,11 @@ router.get('/cities/:country', async (req, res, next) => {
     const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/cities`;
 
     let response = await fetch(url, {
-        headers: { 'X-CSCAPI-KEY': apiKey }
+        headers: { 'X-CSCAPI-KEY': cscAPIKey }
     });
 
     if (response.ok) {
         let citiesData = await response.json();
-        console.log(citiesData);
         res.status(200).json(citiesData);
 
     } else {
@@ -39,5 +97,3 @@ router.get('/cities/:country', async (req, res, next) => {
     }
 
 });
-
-module.exports = router;

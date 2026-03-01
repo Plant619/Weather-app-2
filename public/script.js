@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //////////////////////////////////////////////////////////////////////////////////////
 
     async function getCountries() {
-        const url = `localhost:3000/api/countries`;
+        const url = `/api/countries`;
 
         let response = await fetch(url);
         let countriesData = await response.json();
@@ -55,57 +55,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listening and responding to changes in country-select
     //////////////////////////////////////////////////////////////////////////////////////
 
+    let cityChoices; 
+
     document.getElementById('country-select').addEventListener('change', () => {
         const selectedCountryCode = document.getElementById('country-select').value;
         console.log(selectedCountryCode);
 
         // get cities of the selected country
         getCitiesByCountry(selectedCountryCode).then(cities => {
+            showCities(cities);
 
-            // checking if country has many cities (US, China, India) gets states instead
-            if (cities.length > 1000) {
-                getStatesByCountry(selectedCountryCode).then(states => {
-                    showCities(cities);
+            // Allows users to search for cities in dropdown
+            const citySelect = document.getElementById('city-select');
 
-                    // Allows users to search for cities in dropdown
-                    const citySelect = document.getElementById('city-select');
-                    new Choices(citySelect, {
-                        searchEnabled: true,   // Dropdown is searchable
-                        itemSelectText: '',    // Remove "Press to select" hint
-                        shouldSort: false,     // Keep countries in original order
-                        placeholder: true,
-                        placeholderValue: 'Select a city/state'
-                    });
-                })
-
-            } else {
-                showCities(cities);
-
-                // Allows users to search for cities in dropdown
-                const citySelect = document.getElementById('city-select');
-                new Choices(citySelect, {
-                    searchEnabled: true,   // Dropdown is searchable
-                    itemSelectText: '',    // Remove "Press to select" hint
-                    shouldSort: false,     // Keep countries in original order
-                    placeholder: true,
-                    placeholderValue: 'Select a city/state'
-                });
+            if (cityChoices) {
+                cityChoices.destroy(); // remove old instance
             }
+
+            cityChoices = new Choices(citySelect, {
+                searchEnabled: true,   // Dropdown is searchable
+                itemSelectText: '',    // Remove "Press to select" hint
+                shouldSort: false,     // Keep countries in original order
+                placeholder: true,
+                placeholderValue: 'Select a city/state'
+            });
         })
 
     })
 
 
     //////////////////////////////////////////////////////////////////////////////////////
-    // get cities (country state city docs)
+    // get cities (geodb cities)
     //////////////////////////////////////////////////////////////////////////////////////
 
     async function getCitiesByCountry(countryCode) {
-        const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/cities`;
+        const url = `/api/cities/${countryCode}`;
 
-        let response = await fetch(url, {
-            headers: { 'X-CSCAPI-KEY': process.env.CSC_API_KEY }
-        });
+        let response = await fetch(url);
 
         if (response.ok) {
             let citiesData = await response.json();
@@ -120,7 +106,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // NOTE: some countries have many cities consider using states (US, India, China)
-    // getCitiesByCountry()
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // display cities as select options
+    //////////////////////////////////////////////////////////////////////////////////////
+    async function showCities(cities) {
+        const citiesSelect = document.getElementById('city-select');
+        // stores html that will be added to country select
+        let tempHTML = ``;
+
+        for (let i = 0; i < cities.length; i++) {
+            // store the lat and long
+            let cityName = cities[i].name;
+            let lat = cities[i].latitude;
+            let long = cities[i].longitude;
+
+            tempHTML += `<option value="${[lat, long]}">${cityName}</option>`;
+        }
+
+        citiesSelect.innerHTML = tempHTML;
+    }
+
+
+
 
     //////////////////////////////////////////////////////////////////////////////////////
     // fetch weather information by calling API (openWeather)
