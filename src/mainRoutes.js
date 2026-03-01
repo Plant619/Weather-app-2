@@ -24,6 +24,7 @@ router.get('/countries', async (req, res, next) => {
     
 });
 
+// NOT IN uSE (BUGGED)
 // router.get('/cities/:country', async (req, res, next) => {
 
 //     try {
@@ -69,31 +70,57 @@ router.get('/weather/:lat/:lon', async (req, res, next) => {
 
 })
 
-
-module.exports = router;
-
-
-
-
-
-
 router.get('/cities/:country', async (req, res, next) => {
 
-    const countryCode = req.params.country;
+    try {
+        const countryCode = req.params.country;
 
-    const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/cities`;
+        const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/cities`;
 
-    let response = await fetch(url, {
-        headers: { 'X-CSCAPI-KEY': cscAPIKey }
-    });
+        let response = await fetch(url, {
+            headers: { 'X-CSCAPI-KEY': cscAPIKey }
+        });
 
-    if (response.ok) {
-        let citiesData = await response.json();
-        res.status(200).json(citiesData);
+        if (response.ok) {
+            let citiesData = await response.json();
+            res.status(200).json(citiesData);
 
-    } else {
-        console.error('Error getCitiesByCountry: Country not found or no cities available');
-        res.status(404).json();
+        } else {
+            console.error('Error getCitiesByCountry: Country not found or no cities available');
+            res.status(404).json();
+        }        
+    } catch (err) {
+        console.error(err);
+        res.status(500).json('/cities/:country', err);
     }
 
+
 });
+
+router.get('/states/:country', async (req, res, next) => {
+
+    try {
+        const countryCode = req.params.country;
+
+        const url = `https://api.countrystatecity.in/v1/countries/${countryCode}/states`;
+
+        let response = await fetch(url, {
+            headers: { 'X-CSCAPI-KEY': cscAPIKey }
+        });
+
+        if (response.ok) {
+            let citiesData = await response.json();
+            res.status(200).json(citiesData);
+
+        } else {
+            console.error('Error getCitiesByCountry: Country not found or no cities available');
+            res.status(404).json();
+        }        
+    } catch (err) {
+        console.error(err);
+        res.status(500).json('/states/:country', err);
+    }
+
+})
+
+module.exports = router;

@@ -57,35 +57,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let cityChoices; 
 
-    document.getElementById('country-select').addEventListener('change', () => {
+    document.getElementById('country-select').addEventListener('change', async () => {
         const selectedCountryCode = document.getElementById('country-select').value;
         console.log(selectedCountryCode);
 
         // get cities of the selected country
-        getCitiesByCountry(selectedCountryCode).then(cities => {
-            showCities(cities);
+        let cities = await getCitiesByCountry(selectedCountryCode);
 
-            // Allows users to search for cities in dropdown
-            const citySelect = document.getElementById('city-select');
+        if (cities.length > 100) {
+            // get states instead 
+            cities = await getStatesByCountry(selectedCountryCode);
+        }
 
-            if (cityChoices) {
-                cityChoices.destroy(); // remove old instance
-            }
+        showCities(cities);
 
-            cityChoices = new Choices(citySelect, {
-                searchEnabled: true,   // Dropdown is searchable
-                itemSelectText: '',    // Remove "Press to select" hint
-                shouldSort: false,     // Keep countries in original order
-                placeholder: true,
-                placeholderValue: 'Select a city/state'
-            });
-        })
+        // Allows users to search for cities in dropdown
+        const citySelect = document.getElementById('city-select');
 
+        if (cityChoices) {
+            cityChoices.destroy(); // remove old instance
+        }
+
+        cityChoices = new Choices(citySelect, {
+            searchEnabled: true,   // Dropdown is searchable
+            itemSelectText: '',    // Remove "Press to select" hint
+            shouldSort: false,     // Keep countries in original order
+            placeholder: true,
+            placeholderValue: 'Select a city/state'
+        });
     })
 
+    
 
+
+
+    
     //////////////////////////////////////////////////////////////////////////////////////
-    // get cities (geodb cities)
+    // get cities (country state city docs)
     //////////////////////////////////////////////////////////////////////////////////////
 
     async function getCitiesByCountry(countryCode) {
@@ -127,7 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
         citiesSelect.innerHTML = tempHTML;
     }
 
-
+    //////////////////////////////////////////////////////////////////////////////////////
+    // get states (country state city docs)
+    //////////////////////////////////////////////////////////////////////////////////////
+    async function getStatesByCountry(params) {
+        
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //      6. lang (optional): get the output in your language
 
     // Use the Geocoding API to get latitude and longitude (convert city names and zip-codes to geo coordinates and the other way around.)
-
-
-
 
 })
 
